@@ -7,11 +7,14 @@ requires-python = ">=3.14"
 dependencies = [
     "fastapi[standard]>=0.141.1",
     "fire>=0.7.1",
+    "sqlalchemy>=2.0.51",
+    "sqlmodel>=0.0.39",
 ]
 
 [dependency-groups]
 dev = [
     "black>=26.5.1",
+    "pre-commit>=4.6.1",
     "pyright>=1.1.411",
     "ruff>=0.16.1",
 ]
@@ -33,9 +36,6 @@ ignore = [
 
     "COM812",
     "ISC001",
-
-    "ANN101",
-    "ANN102",
 
     "D100",
     "D104",
