@@ -1,0 +1,16 @@
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from models.raw_transaction import RawTransaction
+
+
+class ABCParser(ABC):
+    """An abstract base class for all parsers."""
+
+    @abstractmethod
+    def parse(self) -> Iterator[RawTransaction]:
+        """Parse method which is obligatory for subclasses to implement."""
+        raise NotImplementedError
