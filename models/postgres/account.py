@@ -7,6 +7,6 @@ class Account(SQLModel, table=True):
     __tablename__ = "account"  # type: ignore[reportAssignmentType]
 
     id: int | None = Field(default=None, primary_key=True)
-    account_id: str = Field(index=True, unique=True)
+    external_account_id: str = Field(index=True, unique=True)
     entity: str
     iban: str

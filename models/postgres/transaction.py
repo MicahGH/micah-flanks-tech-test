@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+from sqlmodel import Index
 from sqlmodel.main import Field, SQLModel
 
 if TYPE_CHECKING:
@@ -11,6 +12,14 @@ class Transaction(SQLModel, table=True):
     """SQL model for the 'transaction' table."""
 
     __tablename__ = "transaction"  # type: ignore[reportAssignmentType]
+
+    __table_args__ = (
+        Index(
+            "cix_transactions_account_date",
+            "account_id",
+            "operation_date",
+        ),
+    )
 
     id: int | None = Field(default=None, primary_key=True)
 
