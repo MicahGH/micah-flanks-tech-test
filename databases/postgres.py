@@ -1,10 +1,7 @@
 import os
-from typing import TYPE_CHECKING
+from collections.abc import Generator
 
 from sqlmodel import Session, SQLModel, create_engine
-
-if TYPE_CHECKING:
-    from collections.abc import Generator
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 

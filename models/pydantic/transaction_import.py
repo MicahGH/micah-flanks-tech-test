@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING
+from datetime import date
+from decimal import Decimal
 
 from dateutil.parser import parse
 from pydantic import BaseModel, field_validator
@@ -6,10 +7,6 @@ from pydantic import BaseModel, field_validator
 from models.enums.category import Category
 from models.enums.currency import Currency
 from models.enums.entity import Entity
-
-if TYPE_CHECKING:
-    from datetime import date
-    from decimal import Decimal
 
 
 class TransactionImport(BaseModel):

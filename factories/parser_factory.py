@@ -1,12 +1,9 @@
 from pathlib import Path
-from typing import TYPE_CHECKING
 
+from fastapi import UploadFile
+
+from parsers.abc_parser import ABCParser
 from parsers.csv_parser import CSVParser
-
-if TYPE_CHECKING:
-    from fastapi import UploadFile
-
-    from parsers.abc_parser import ABCParser
 
 
 class UnsupportedFileTypeError(BaseException):

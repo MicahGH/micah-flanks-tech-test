@@ -1,5 +1,5 @@
-from datetime import date  # noqa: TC003
-from decimal import Decimal  # noqa: TC003
+from datetime import date
+from decimal import Decimal
 
 from sqlmodel import Index
 from sqlmodel.main import Field, SQLModel

@@ -1,17 +1,14 @@
-from typing import TYPE_CHECKING, cast
+from datetime import date
+from typing import cast
+
+from sqlmodel import Session
 
 from models.postgres.transaction import Transaction
 from models.pydantic.transaction_import import TransactionImport
+from models.typed_dicts.transactions_summary import TransactionsSummary
+from parsers.abc_parser import ABCParser
 from repositories.transaction_repository import TransactionRepository
 from services.account_service import AccountService
-
-if TYPE_CHECKING:
-    from datetime import date
-
-    from sqlmodel import Session
-
-    from models.typed_dicts.transactions_summary import TransactionsSummary
-    from parsers.abc_parser import ABCParser
 
 
 class TransactionService:
@@ -25,7 +22,6 @@ class TransactionService:
     def import_transactions(self, parser: ABCParser) -> None:
         """Import transactions into the DB."""
         for row in parser.parse():
-
             transaction = TransactionImport.model_validate(row)
 
             account = self._account_service.get_or_create_account(

@@ -1,19 +1,15 @@
+from datetime import date
 from http.client import OK
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
 from fastapi import Depends, FastAPI, File, UploadFile
+from sqlmodel import Session
 
 from databases.postgres import create_postgres_db, get_postgres_session
 from factories.parser_factory import ParserFactory
+from models.postgres.transaction import Transaction
+from models.typed_dicts.transactions_summary import TransactionsSummary
 from services.transaction_service import TransactionService
-
-if TYPE_CHECKING:
-    from datetime import date
-
-    from sqlmodel import Session
-
-    from models.postgres.transaction import Transaction
-    from models.typed_dicts.transactions_summary import TransactionsSummary
 
 app = FastAPI()
 

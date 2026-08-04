@@ -1,10 +1,7 @@
-from typing import TYPE_CHECKING
+from sqlmodel import Session
 
 from models.postgres.account import Account
 from repositories.account_repository import AccountRepository
-
-if TYPE_CHECKING:
-    from sqlmodel import Session
 
 
 class AccountService:

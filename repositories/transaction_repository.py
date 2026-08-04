@@ -1,13 +1,10 @@
-from typing import TYPE_CHECKING
+from datetime import date
 
 from sqlmodel import col, func, select
 
 from models.postgres.transaction import Transaction
 from models.typed_dicts.transactions_summary import TransactionsSummary
 from repositories.base_repository import BaseRepository
-
-if TYPE_CHECKING:
-    from datetime import date
 
 
 class TransactionRepository(BaseRepository[Transaction]):

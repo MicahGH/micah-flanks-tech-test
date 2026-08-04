@@ -1,12 +1,10 @@
 import csv
 import io
-from typing import TYPE_CHECKING, BinaryIO
+from collections.abc import Iterator
+from typing import BinaryIO
 
 from models.dataclasses.raw_transaction import RawTransaction
 from parsers.abc_parser import ABCParser
-
-if TYPE_CHECKING:
-    from collections.abc import Iterator
 
 
 class CSVParser(ABCParser):

@@ -1,7 +1,5 @@
-from typing import TYPE_CHECKING, TypedDict
-
-if TYPE_CHECKING:
-    from decimal import Decimal
+from decimal import Decimal
+from typing import TypedDict
 
 
 class TransactionsSummary(TypedDict):

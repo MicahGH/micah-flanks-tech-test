@@ -1,10 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from collections.abc import Iterator
 
-if TYPE_CHECKING:
-    from collections.abc import Iterator
-
-    from models.dataclasses.raw_transaction import RawTransaction
+from models.dataclasses.raw_transaction import RawTransaction
 
 
 class ABCParser(ABC):

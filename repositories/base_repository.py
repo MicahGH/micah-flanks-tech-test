@@ -1,9 +1,7 @@
-from typing import TYPE_CHECKING, TypeVar
+from collections.abc import Iterable
+from typing import TypeVar
 
 from sqlmodel import Session, SQLModel
-
-if TYPE_CHECKING:
-    from collections.abc import Iterable
 
 T = TypeVar("T", bound=SQLModel)
 
