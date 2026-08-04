@@ -8,6 +8,7 @@ from parsers.abc_parser import ABCParser
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
+
 class CSVParser(ABCParser):
     """Parser to parse CSV files."""
 
