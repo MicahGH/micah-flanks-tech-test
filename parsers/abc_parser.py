@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-    from models.raw_transaction import RawTransaction
+    from models.dataclasses.raw_transaction import RawTransaction
 
 
 class ABCParser(ABC):
