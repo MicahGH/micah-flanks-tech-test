@@ -1,0 +1,71 @@
+[project]
+name = "micah-flanks-tech-test"
+version = "0.1.0"
+description = "A small repo for a Flanks' technical test."
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi[standard]>=0.141.1",
+    "fire>=0.7.1",
+]
+
+[dependency-groups]
+dev = [
+    "black>=26.5.1",
+    "pyright>=1.1.411",
+    "ruff>=0.16.1",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py314"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "TD002",
+    "TD003",
+    "FIX002",
+
+    "COM812",
+    "ISC001",
+
+    "ANN101",
+    "ANN102",
+
+    "D100",
+    "D104",
+    "D105",
+    "D107",
+
+    "CPY001",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pyright]
+typeCheckingMode = "strict"
+
+reportMissingTypeStubs = false
+reportUnknownMemberType = true
+reportUnknownArgumentType = true
+reportUnknownVariableType = true
+reportUnknownLambdaType = true
+reportUnknownParameterType = true
+reportUnknownReturnType = true
+reportUnknownTypeArgument = true
+
+reportUnusedImport = true
+reportUnusedVariable = true
+reportUnusedFunction = true
+
+pythonVersion = "3.14"
