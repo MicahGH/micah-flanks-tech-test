@@ -120,7 +120,7 @@ Tests cover:
 Before production I would add:
 
 - Database migrations with Alembic.
-- Better observability with logs and metrics.
+- Better observability with logs and metrics, for example, letting the importer know what rows, objects, etc. of the uploaded file are malformed and how.
 - Distributed cache (Redis).
 - Background processing for large imports. Maybe queues using RabbitMQ.
 - Authentication and authorization.
