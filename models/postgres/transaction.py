@@ -2,10 +2,12 @@ from datetime import date
 from decimal import Decimal
 
 from sqlmodel import Index
-from sqlmodel.main import Field, SQLModel
+from sqlmodel.main import Field
+
+from models.postgres.base_sql_model import BaseSQLModel
 
 
-class Transaction(SQLModel, table=True):
+class Transaction(BaseSQLModel, table=True):
     """SQL model for the 'transaction' table."""
 
     __tablename__ = "transaction"  # type: ignore[reportAssignmentType]

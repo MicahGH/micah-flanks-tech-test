@@ -2,7 +2,9 @@ from collections.abc import Iterable
 from typing import Any, TypeVar
 
 from sqlalchemy.dialects.postgresql import insert
-from sqlmodel import Session, SQLModel
+from sqlmodel import Session, SQLModel, col
+
+from models.postgres.base_sql_model import BaseSQLModel
 
 T = TypeVar("T", bound=SQLModel)
 
@@ -31,7 +33,7 @@ class BaseRepository[T: SQLModel]:
 
     def insert_on_conflict_do_nothing(
         self,
-        model: type[SQLModel],
+        model: type[BaseSQLModel],
         values: dict[str, Any],
         conflict_columns: list[str],
     ) -> bool:
@@ -40,7 +42,9 @@ class BaseRepository[T: SQLModel]:
             insert(model)
             .values(**values)
             .on_conflict_do_nothing(index_elements=conflict_columns)
+            .returning(col(model.id))
         )
 
         result = self._session.exec(stmt)
-        return result.rowcount == 1
+
+        return result.first() is not None
