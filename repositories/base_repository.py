@@ -1,6 +1,7 @@
 from collections.abc import Iterable
-from typing import TypeVar
+from typing import Any, TypeVar
 
+from sqlalchemy.dialects.postgresql import insert
 from sqlmodel import Session, SQLModel
 
 T = TypeVar("T", bound=SQLModel)
@@ -27,3 +28,19 @@ class BaseRepository[T: SQLModel]:
     def refresh(self, entity: T) -> None:
         """Refresh a provided entity."""
         self._session.refresh(entity)
+
+    def insert_on_conflict_do_nothing(
+        self,
+        model: type[SQLModel],
+        values: dict[str, Any],
+        conflict_columns: list[str],
+    ) -> bool:
+        """Insert the record, if there is not a conflict else ignore it."""
+        stmt = (
+            insert(model)
+            .values(**values)
+            .on_conflict_do_nothing(index_elements=conflict_columns)
+        )
+
+        result = self._session.exec(stmt)
+        return result.rowcount == 1

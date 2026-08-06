@@ -1,5 +1,7 @@
+import re
 from datetime import date
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
+from typing import Any
 
 from dateutil.parser import parse
 from pydantic import BaseModel, field_validator
@@ -35,9 +37,11 @@ class TransactionImport(BaseModel):
 
     @field_validator("*", mode="before")
     @classmethod
-    def strip_strings(cls, value: str) -> str:
+    def strip_strings(cls, value: Any) -> str:  # noqa: ANN401
         """Strip whitespace inside strings."""
-        return value.strip()
+        if isinstance(value, str):
+            return value.strip()
+        return value
 
     @field_validator("entity", mode="before")
     @classmethod
@@ -62,3 +66,29 @@ class TransactionImport(BaseModel):
     def parse_date(cls, value: str) -> date:
         """Parse the date column to be standard."""
         return parse(value, dayfirst=True).date()
+
+    @field_validator("amount", "balance", mode="before")
+    @classmethod
+    def parse_decimal(cls, value: str) -> Decimal:
+        """Parse the decimal columns to convert them."""
+        if isinstance(value, Decimal):
+            return value
+
+        if isinstance(value, (int, float)):
+            return Decimal(str(value))
+
+        value = str(value).strip()
+
+        value = re.sub(r"[^0-9,.\-]", "", value)
+
+        if "," in value and "." in value:
+            value = value.replace(",", "")
+
+        elif "," in value:
+            value = value.replace(",", ".")
+
+        try:
+            return Decimal(value)
+        except InvalidOperation as exc:
+            msg = f"Invalid decimal format: {value!r}"
+            raise ValueError(msg) from exc

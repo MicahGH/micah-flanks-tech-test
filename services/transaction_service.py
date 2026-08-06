@@ -1,8 +1,10 @@
 from datetime import date
 from typing import cast
 
+from pydantic import ValidationError
 from sqlmodel import Session
 
+from models.dataclasses.import_result import ImportResult
 from models.postgres.transaction import Transaction
 from models.pydantic.transaction_import import TransactionImport
 from models.typed_dicts.transactions_summary import TransactionsSummary
@@ -12,41 +14,60 @@ from services.account_service import AccountService
 
 
 class TransactionService:
-    """Service that handles the transactions provided."""
+    """Service that handles the logic for transactions."""
 
     def __init__(self, pg_session: Session) -> None:
         self._session = pg_session
         self._repository = TransactionRepository(self._session)
         self._account_service = AccountService(self._session)
 
-    def import_transactions(self, parser: ABCParser) -> None:
+    def import_transactions(self, parser: ABCParser) -> ImportResult:
         """Import transactions into the DB."""
+        result = ImportResult()
+
         for row in parser.parse():
-            transaction = TransactionImport.model_validate(row)
+            result.total += 1
+
+            try:
+                transaction_import = TransactionImport.model_validate(row.values)
+            except ValidationError:
+                result.malformed += 1
+                continue
 
             account = self._account_service.get_or_create_account(
-                external_account_id=transaction.account_id,
-                entity=transaction.entity,
-                iban=transaction.iban,
+                external_account_id=transaction_import.account_id,
+                entity=transaction_import.entity,
+                iban=transaction_import.iban,
             )
 
             db_transaction = Transaction(
-                transaction_id=transaction.transaction_id,
+                transaction_id=transaction_import.transaction_id,
                 account_id=cast("int", account.id),
-                operation_date=transaction.operation_date,
-                value_date=transaction.value_date,
-                amount=transaction.amount,
-                balance=transaction.balance,
-                currency=transaction.currency,
-                category=transaction.category,
-                category_code=transaction.category_code,
-                transaction_type=transaction.transaction_type,
-                description=transaction.description,
+                operation_date=transaction_import.operation_date,
+                value_date=transaction_import.value_date,
+                amount=transaction_import.amount,
+                balance=transaction_import.balance,
+                currency=transaction_import.currency,
+                category=transaction_import.category,
+                category_code=transaction_import.category_code,
+                transaction_type=transaction_import.transaction_type,
+                description=transaction_import.description,
             )
 
-            self._repository.save(db_transaction)
+            inserted = self._repository.insert_on_conflict_do_nothing(
+                model=Transaction,
+                values=db_transaction.model_dump(exclude={"id"}),
+                conflict_columns=["transaction_id"],
+            )
+
+            if inserted:
+                result.imported += 1
+            else:
+                result.duplicates += 1
 
         self._repository.commit()
+
+        return result
 
     def get_transactions(
         self, account_id: int, from_date: date, to_date: date

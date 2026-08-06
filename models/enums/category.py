@@ -7,14 +7,15 @@ class Category(StrEnum):
     TRANSPORTE = "TRANSPORTE"
     EDUCACION = "EDUCACION"
     RESTAURANTES = "RESTAURANTES"
-    SUPERMERCADOS = "SUPERMERCADOS"
-    OCIO = "OCIO"
     SALUD = "SALUD"
-    HOGAR = "HOGAR"
-    VIAJES = "VIAJES"
     NOMINA = "NOMINA"
-    TRANSFERENCIAS = "TRANSFERENCIAS"
-    OTROS = "OTROS"
+    ALQUILER = "ALQUILER"
+    OCIO = "OCIO"
+    ALIMENTACION = "ALIMENTACION"
+    MODA = "MODA"
+    SEGUROS = "SEGUROS"
+    RECIBO = "RECIBO"
+    TRANSFERENCIA = "TRANSFERENCIA"
 
     @classmethod
     def from_raw(cls, value: str) -> Category:
