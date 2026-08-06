@@ -4,6 +4,7 @@ from typing import cast
 from pydantic import ValidationError
 from sqlmodel import Session
 
+from cache.summary_cache import SummaryCache
 from models.dataclasses.import_result import ImportResult
 from models.postgres.transaction import Transaction
 from models.pydantic.transaction_import import TransactionImport
@@ -16,10 +17,11 @@ from services.account_service import AccountService
 class TransactionService:
     """Service that handles the logic for transactions."""
 
-    def __init__(self, pg_session: Session) -> None:
+    def __init__(self, pg_session: Session, cache: SummaryCache) -> None:
         self._session = pg_session
         self._repository = TransactionRepository(self._session)
         self._account_service = AccountService(self._session)
+        self._cache = cache
 
     def import_transactions(self, parser: ABCParser) -> ImportResult:
         """Import transactions into the DB."""
@@ -62,6 +64,7 @@ class TransactionService:
 
             if inserted:
                 result.imported += 1
+                self._cache.invalidate(cast("int", account.id))
             else:
                 result.duplicates += 1
 
@@ -77,4 +80,16 @@ class TransactionService:
 
     def get_transactions_summary(self, account_id: int) -> TransactionsSummary:
         """Get a summary of the transactions for the account provided."""
-        return self._repository.get_transactions_summary(account_id)
+        cached = self._cache.get(account_id)
+
+        if cached:
+            return cached
+
+        summary = self._repository.get_transactions_summary(account_id)
+
+        self._cache.set(
+            account_id,
+            summary,
+        )
+
+        return summary

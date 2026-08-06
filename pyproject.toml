@@ -5,6 +5,7 @@ description = "A small repo for a Flanks' technical test."
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "cachetools>=7.1.7",
     "fastapi[standard]>=0.141.1",
     "fire>=0.7.1",
     "psycopg[binary]>=3.3.4",

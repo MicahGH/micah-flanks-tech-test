@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, File, UploadFile
 from sqlmodel import Session
 
+from cache.summary_cache import SummaryCache
 from databases.postgres import create_postgres_db, get_postgres_session
 from factories.parser_factory import ParserFactory
 from models.dataclasses.import_result import ImportResult
@@ -18,6 +19,7 @@ app = FastAPI()
 def startup() -> None:
     """Execute the tasks on app startup."""
     create_postgres_db()
+    app.state.summary_cache = SummaryCache()
 
 
 @app.post("/transactions/import")
@@ -28,7 +30,9 @@ def import_transactions(
     """Import transactions to the DB from an uploaded file."""
     parser = ParserFactory.create(upload_file=upload_file)
 
-    return TransactionService(pg_session=pg_session).import_transactions(parser=parser)
+    return TransactionService(
+        pg_session=pg_session, cache=app.state.summary_cache
+    ).import_transactions(parser=parser)
 
 
 @app.get("/transactions")
@@ -39,7 +43,9 @@ def get_transactions(
     pg_session: Annotated[Session, Depends(get_postgres_session)],
 ) -> list[Transaction]:
     """Get transactions between provided dates for a provided account."""
-    return TransactionService(pg_session=pg_session).get_transactions(
+    return TransactionService(
+        pg_session=pg_session, cache=app.state.summary_cache
+    ).get_transactions(
         account_id=account_id,
         from_date=from_date,
         to_date=to_date,
@@ -52,6 +58,6 @@ def get_transactions_summary(
     pg_session: Annotated[Session, Depends(get_postgres_session)],
 ) -> TransactionsSummary:
     """Get summary of transactions for an account."""
-    return TransactionService(pg_session=pg_session).get_transactions_summary(
-        account_id
-    )
+    return TransactionService(
+        pg_session=pg_session, cache=app.state.summary_cache
+    ).get_transactions_summary(account_id)
