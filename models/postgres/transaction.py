@@ -20,8 +20,6 @@ class Transaction(BaseSQLModel, table=True):
         ),
     )
 
-    id: int | None = Field(default=None, primary_key=True)
-
     transaction_id: str = Field(unique=True, index=True)
 
     account_id: int = Field(foreign_key="account.id", index=True)
