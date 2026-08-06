@@ -9,6 +9,7 @@ dependencies = [
     "fastapi[standard]>=0.141.1",
     "fire>=0.7.1",
     "psycopg[binary]>=3.3.4",
+    "pytest>=9.1.1",
     "python-dateutil>=2.9.0.post0",
     "sqlalchemy>=2.0.51",
     "sqlmodel>=0.0.39",
@@ -52,6 +53,8 @@ ignore = [
     "TC003",
     "TC002",
     "TC001",
+
+    "S101",
 ]
 
 [tool.ruff.lint.pydocstyle]
