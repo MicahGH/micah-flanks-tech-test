@@ -16,14 +16,14 @@ class SummaryCache:
             ttl=ttl_seconds,
         )
 
-    def get(self, account_id: int) -> TransactionsSummary | None:
+    def get(self, account_id: int) -> list[TransactionsSummary] | None:
         """Get a value from the cache."""
         return self._cache.get(account_id)
 
     def set(
         self,
         account_id: int,
-        summary: TransactionsSummary,
+        summary: list[TransactionsSummary],
     ) -> None:
         """Set a k-v in the cache."""
         self._cache[account_id] = summary

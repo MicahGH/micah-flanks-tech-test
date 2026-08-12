@@ -22,19 +22,25 @@ class TransactionRepository(BaseRepository[Transaction]):
         )
         return list(self._session.exec(statement).all())
 
-    def get_transactions_summary(self, account_id: int) -> TransactionsSummary:
+    def get_transactions_summary(self, account_id: int) -> list[TransactionsSummary]:
         """Get a summary of the transactions for the provided account."""
-        statement = select(
-            func.coalesce(func.sum(Transaction.amount), 0).label("total_balance"),
-            func.coalesce(
-                func.sum(Transaction.amount).filter(col(Transaction.amount) > 0),
-                0,
-            ).label("total_credits"),
-            func.coalesce(
-                func.sum(Transaction.amount).filter(col(Transaction.amount) < 0),
-                0,
-            ).label("total_debits"),
-        ).where(Transaction.account_id == account_id)
+        statement = (
+            select(
+                func.coalesce(func.sum(Transaction.amount), 0).label("total_balance"),
+                func.coalesce(
+                    func.sum(Transaction.amount).filter(col(Transaction.amount) > 0),
+                    0,
+                ).label("total_credits"),
+                func.coalesce(
+                    func.sum(Transaction.amount).filter(col(Transaction.amount) < 0),
+                    0,
+                ).label("total_debits"),
+                Transaction.currency,
+            )
+            .where(Transaction.account_id == account_id)
+            .group_by(col(Transaction.currency), col(Transaction.account_id))
+        )
 
-        result = self._session.execute(statement).mappings().one()  # type: ignore[reportDeprecated]
-        return TransactionsSummary(**result)
+        result = self._session.execute(statement).mappings()  # type: ignore[reportDeprecated]
+
+        return [TransactionsSummary(**row) for row in result]

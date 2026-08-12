@@ -78,7 +78,7 @@ class TransactionService:
         """Get a list of transactions for the account and dates provided."""
         return self._repository.get_transactions(account_id, from_date, to_date)
 
-    def get_transactions_summary(self, account_id: int) -> TransactionsSummary:
+    def get_transactions_summary(self, account_id: int) -> list[TransactionsSummary]:
         """Get a summary of the transactions for the account provided."""
         cached = self._cache.get(account_id)
 

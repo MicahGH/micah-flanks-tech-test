@@ -36,6 +36,7 @@ def test_get_transaction_summary(client: TestClient) -> None:
 
     data = response.json()  # type: ignore[reportUnknownMemberType]
 
-    assert "total_balance" in data
-    assert "total_credits" in data
-    assert "total_debits" in data
+    assert "total_balance" in data[0]
+    assert "total_credits" in data[0]
+    assert "total_debits" in data[0]
+    assert "currency" in data[0]

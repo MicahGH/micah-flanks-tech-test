@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from cache.summary_cache import SummaryCache
+from models.enums.currency import Currency
 from models.typed_dicts.transactions_summary import TransactionsSummary
 
 
@@ -8,11 +9,14 @@ def test_cache_stores_summary() -> None:
     """Test that a summary is stored in the cache."""
     cache = SummaryCache()
 
-    summary = TransactionsSummary(
-        total_balance=Decimal(0),
-        total_credits=Decimal(100),
-        total_debits=Decimal(-100),
-    )
+    summary = [
+        TransactionsSummary(
+            total_balance=Decimal(0),
+            total_credits=Decimal(100),
+            total_debits=Decimal(-100),
+            currency=Currency.EUR,
+        )
+    ]
 
     cache.set(
         account_id=1,
@@ -35,11 +39,14 @@ def test_cache_invalidation() -> None:
     """Test that the cache invalidation functionality works properly."""
     cache = SummaryCache()
 
-    summary = TransactionsSummary(
-        total_balance=Decimal(0),
-        total_credits=Decimal(100),
-        total_debits=Decimal(-100),
-    )
+    summary = [
+        TransactionsSummary(
+            total_balance=Decimal(0),
+            total_credits=Decimal(100),
+            total_debits=Decimal(-100),
+            currency=Currency.EUR,
+        )
+    ]
 
     cache.set(
         account_id=1,

@@ -56,7 +56,7 @@ def get_transactions(
 def get_transactions_summary(
     account_id: int,
     pg_session: Annotated[Session, Depends(get_postgres_session)],
-) -> TransactionsSummary:
+) -> list[TransactionsSummary]:
     """Get summary of transactions for an account."""
     return TransactionService(
         pg_session=pg_session, cache=app.state.summary_cache
