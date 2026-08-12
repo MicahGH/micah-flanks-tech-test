@@ -27,11 +27,11 @@ class TransactionService:
         """Import transactions into the DB."""
         result = ImportResult()
 
-        for row in parser.parse():
+        for raw_transaction in parser.parse():
             result.total += 1
 
             try:
-                transaction_import = TransactionImport.model_validate(row)
+                transaction_import = TransactionImport.model_validate(raw_transaction)
             except ValidationError:
                 result.malformed += 1
                 continue
