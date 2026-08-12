@@ -10,6 +10,7 @@ from models.postgres.transaction import Transaction
 from models.pydantic.transaction_import import TransactionImport
 from models.typed_dicts.transactions_summary import TransactionsSummary
 from parsers.abc_parser import ABCParser
+from repositories.malformed_transaction_repository import MalformedTransactionRepository
 from repositories.transaction_repository import TransactionRepository
 from services.account_service import AccountService
 
@@ -19,9 +20,10 @@ class TransactionService:
 
     def __init__(self, pg_session: Session, cache: SummaryCache) -> None:
         self._session = pg_session
-        self._repository = TransactionRepository(self._session)
+        self._transaction_repo = TransactionRepository(self._session)
         self._account_service = AccountService(self._session)
         self._cache = cache
+        self._malformed_transaction_repo = MalformedTransactionRepository(self._session)
 
     def import_transactions(self, parser: ABCParser) -> ImportResult:
         """Import transactions into the DB."""
@@ -56,7 +58,7 @@ class TransactionService:
                 description=transaction_import.description,
             )
 
-            inserted = self._repository.insert_on_conflict_do_nothing(
+            inserted = self._transaction_repo.insert_on_conflict_do_nothing(
                 model=Transaction,
                 values=db_transaction.model_dump(exclude={"id"}),
                 conflict_columns=["transaction_id"],
@@ -68,7 +70,7 @@ class TransactionService:
             else:
                 result.duplicates += 1
 
-        self._repository.commit()
+        self._transaction_repo.commit()
 
         return result
 
@@ -76,7 +78,7 @@ class TransactionService:
         self, account_id: int, from_date: date, to_date: date
     ) -> list[Transaction]:
         """Get a list of transactions for the account and dates provided."""
-        return self._repository.get_transactions(account_id, from_date, to_date)
+        return self._transaction_repo.get_transactions(account_id, from_date, to_date)
 
     def get_transactions_summary(self, account_id: int) -> list[TransactionsSummary]:
         """Get a summary of the transactions for the account provided."""
@@ -85,7 +87,7 @@ class TransactionService:
         if cached:
             return cached
 
-        summary = self._repository.get_transactions_summary(account_id)
+        summary = self._transaction_repo.get_transactions_summary(account_id)
 
         self._cache.set(
             account_id,
