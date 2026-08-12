@@ -10,6 +10,8 @@ from models.postgres.base_sql_model import BaseSQLModel
 class MalformedTransaction(BaseSQLModel, table=True):
     """Malformed transaction received during import."""
 
+    __tablename__ = "malformed_transaction"  # type: ignore[reportAssignmentType]
+
     raw_data: dict[str, Any] = Field(sa_type=JSONB)
     errors: list[dict[str, Any]] = Field(sa_type=JSONB)
     created_at: datetime = Field(
