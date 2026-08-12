@@ -18,6 +18,11 @@ class Transaction(BaseSQLModel, table=True):
             "account_id",
             "operation_date",
         ),
+        Index(
+            "cix_transactions_account_currency",
+            "account_id",
+            "currency",
+        ),
     )
 
     transaction_id: str = Field(unique=True, index=True)
