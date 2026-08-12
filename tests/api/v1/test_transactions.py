@@ -7,7 +7,7 @@ from httpx import Response
 def test_get_transactions(client: TestClient) -> None:
     """Test get_transactions() endpoint."""
     response: Response = client.get(  # type: ignore[reportUnknownMemberType]
-        url="/transactions",
+        url="/api/v1/transactions",
         params={
             "account_id": 1,
             "from_date": "2024-01-01",
@@ -26,7 +26,7 @@ def test_get_transactions(client: TestClient) -> None:
 def test_get_transaction_summary(client: TestClient) -> None:
     """Test get_transaction_summary() endpoint."""
     response: Response = client.get(  # type: ignore[reportUnknownMemberType]
-        url="/transactions/summary",
+        url="/api/v1/transactions/summary",
         params={
             "account_id": 1,
         },

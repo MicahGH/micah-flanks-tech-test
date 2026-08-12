@@ -1,6 +1,12 @@
 from cachetools import TTLCache
+from fastapi import Request
 
 from models.typed_dicts.transactions_summary import TransactionsSummary
+
+
+def get_summary_cache(request: Request) -> SummaryCache:
+    """Get the summary cache from the app's state."""
+    return request.app.state.summary_cache
 
 
 class SummaryCache:
