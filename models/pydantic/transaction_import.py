@@ -64,8 +64,8 @@ class TransactionImport(BaseModel):
     @field_validator("operation_date", "value_date", mode="before")
     @classmethod
     def parse_date(cls, value: str) -> date:
-        """Parse the date column to be standard."""
-        return parse(value, dayfirst=True).date()
+        """Parse the date column to be ISO standard."""
+        return parse(value, yearfirst=True).date()
 
     @field_validator("amount", "balance", mode="before")
     @classmethod

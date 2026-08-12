@@ -1,11 +1,13 @@
+from dataclasses import asdict
 from datetime import date
 from typing import cast
 
-from pydantic import ValidationError
 from sqlmodel import Session
 
 from cache.summary_cache import SummaryCache
+from errors.transaction_normalization_error import TransactionNormalizationError
 from models.dataclasses.import_result import ImportResult
+from models.postgres.malformed_transaction import MalformedTransaction
 from models.postgres.transaction import Transaction
 from models.pydantic.transaction_import import TransactionImport
 from models.typed_dicts.transactions_summary import TransactionsSummary
@@ -34,7 +36,13 @@ class TransactionService:
 
             try:
                 transaction_import = TransactionImport.model_validate(raw_transaction)
-            except ValidationError:
+            except TransactionNormalizationError as exc:
+                self._malformed_transaction_repo.save(
+                    MalformedTransaction(
+                        raw_data=asdict(raw_transaction),
+                        errors=exc.errors,
+                    )
+                )
                 result.malformed += 1
                 continue
 
@@ -71,6 +79,7 @@ class TransactionService:
                 result.duplicates += 1
 
         self._transaction_repo.commit()
+        self._malformed_transaction_repo.commit()
 
         return result
 

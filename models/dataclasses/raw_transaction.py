@@ -5,16 +5,16 @@ from dataclasses import dataclass
 class RawTransaction:
     """Raw transaction as received from the CSV."""
 
-    transaction_id: str | None
-    account_id: str | None
-    entity: str | None
-    iban: str | None
-    balance: str | None
-    amount: str | None
-    currency: str | None
-    category: str | None
-    category_code: str | None
-    transaction_type: str | None
-    operation_date: str | None
-    value_date: str | None
-    description: str | None
+    transaction_id: str
+    account_id: str
+    entity: str
+    iban: str
+    balance: str
+    amount: str
+    currency: str
+    category: str
+    category_code: str
+    transaction_type: str
+    operation_date: str
+    value_date: str
+    description: str
