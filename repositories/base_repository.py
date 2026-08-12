@@ -1,9 +1,10 @@
 from collections.abc import Iterable
-from typing import Any, TypeVar
+from typing import TypeVar
 
 from sqlalchemy.dialects.postgresql import insert
-from sqlmodel import Session, SQLModel, col
+from sqlmodel import Boolean, Session, SQLModel, literal_column
 
+from models.enums.upsert_result import UpsertResult
 from models.postgres.base_sql_model import BaseSQLModel
 
 T = TypeVar("T", bound=SQLModel)
@@ -31,31 +32,13 @@ class BaseRepository[T: SQLModel]:
         """Refresh a provided entity."""
         self._session.refresh(entity)
 
-    def insert_on_conflict_do_nothing(
-        self,
-        model: type[BaseSQLModel],
-        values: dict[str, Any],
-        conflict_columns: list[str],
-    ) -> bool:
-        """Insert the record, if there is not a conflict else ignore it."""
-        stmt = (
-            insert(model)
-            .values(**values)
-            .on_conflict_do_nothing(index_elements=conflict_columns)
-            .returning(col(model.id))
-        )
-
-        result = self._session.exec(stmt)
-
-        return result.first() is not None
-
     def insert_on_conflict_do_update(
         self,
         model: type[BaseSQLModel],
         values: dict[str, object],
         conflict_columns: list[str],
-    ) -> bool:
-        """Insert a transaction or update it if it already exists."""
+    ) -> UpsertResult:
+        """Insert a record or update it if it already exists."""
         statement = insert(model).values(values)
 
         update_values = {
@@ -67,8 +50,14 @@ class BaseRepository[T: SQLModel]:
             set_=update_values,
         )
 
-        statement = statement.returning(col(model.id))
+        # Small hack to see if the statement ended up being an INSERT or an UPDATE
+        inserted_column = literal_column(
+            "(xmax = 0)",
+            type_=Boolean(),
+        ).label("inserted")
 
-        result = self._session.exec(statement)
+        statement = statement.returning(inserted_column)
 
-        return result.first() is not None
+        result = self._session.exec(statement).one()
+
+        return UpsertResult.INSERTED if result.inserted else UpsertResult.UPDATED

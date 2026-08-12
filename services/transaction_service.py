@@ -1,12 +1,14 @@
+import json
 from dataclasses import asdict
 from datetime import date
 from typing import cast
 
+from pydantic import ValidationError
 from sqlmodel import Session
 
 from cache.summary_cache import SummaryCache
-from errors.transaction_normalization_error import TransactionNormalizationError
 from models.dataclasses.import_result import ImportResult
+from models.enums.upsert_result import UpsertResult
 from models.postgres.malformed_transaction import MalformedTransaction
 from models.postgres.transaction import Transaction
 from models.pydantic.transaction_import import TransactionImport
@@ -35,12 +37,14 @@ class TransactionService:
             result.total += 1
 
             try:
-                transaction_import = TransactionImport.model_validate(raw_transaction)
-            except TransactionNormalizationError as exc:
+                transaction_import = TransactionImport.model_validate(
+                    asdict(raw_transaction)
+                )
+            except ValidationError as exc:
                 self._malformed_transaction_repo.save(
                     MalformedTransaction(
                         raw_data=asdict(raw_transaction),
-                        errors=exc.errors,
+                        errors=json.loads(json.dumps(exc.errors(), default=str)),
                     )
                 )
                 result.malformed += 1
@@ -66,17 +70,20 @@ class TransactionService:
                 description=transaction_import.description,
             )
 
-            inserted = self._transaction_repo.insert_on_conflict_do_update(
+            upsert_result = self._transaction_repo.insert_on_conflict_do_update(
                 model=Transaction,
                 values=db_transaction.model_dump(exclude={"id"}),
                 conflict_columns=["transaction_id"],
             )
 
-            if inserted:
+            if upsert_result is UpsertResult.INSERTED:
                 result.imported += 1
-                self._cache.invalidate(cast("int", account.id))
             else:
                 result.updated += 1
+
+            self._cache.invalidate(cast("int", account.id))
+
+            self._cache.invalidate(cast("int", account.id))
 
         self._transaction_repo.commit()
         self._malformed_transaction_repo.commit()
