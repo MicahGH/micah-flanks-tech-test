@@ -66,7 +66,7 @@ class TransactionService:
                 description=transaction_import.description,
             )
 
-            inserted = self._transaction_repo.insert_on_conflict_do_nothing(
+            inserted = self._transaction_repo.insert_on_conflict_do_update(
                 model=Transaction,
                 values=db_transaction.model_dump(exclude={"id"}),
                 conflict_columns=["transaction_id"],

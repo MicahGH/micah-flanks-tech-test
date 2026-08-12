@@ -48,3 +48,27 @@ class BaseRepository[T: SQLModel]:
         result = self._session.exec(stmt)
 
         return result.first() is not None
+
+    def insert_on_conflict_do_update(
+        self,
+        model: type[BaseSQLModel],
+        values: dict[str, object],
+        conflict_columns: list[str],
+    ) -> bool:
+        """Insert a transaction or update it if it already exists."""
+        statement = insert(model).values(values)
+
+        update_values = {
+            key: value for key, value in values.items() if key not in conflict_columns
+        }
+
+        statement = statement.on_conflict_do_update(
+            index_elements=conflict_columns,
+            set_=update_values,
+        )
+
+        statement = statement.returning(col(model.id))
+
+        result = self._session.exec(statement)
+
+        return result.first() is not None
