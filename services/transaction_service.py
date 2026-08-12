@@ -83,8 +83,6 @@ class TransactionService:
 
             self._cache.invalidate(cast("int", account.id))
 
-            self._cache.invalidate(cast("int", account.id))
-
         self._transaction_repo.commit()
         self._malformed_transaction_repo.commit()
 
