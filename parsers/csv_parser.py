@@ -18,4 +18,4 @@ class CSVParser(ABCParser):
         reader = csv.DictReader(io.TextIOWrapper(self._file, encoding="utf-8"))
 
         for row in reader:
-            yield RawTransaction(values=row)
+            yield RawTransaction(**row)

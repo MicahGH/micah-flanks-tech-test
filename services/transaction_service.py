@@ -31,7 +31,7 @@ class TransactionService:
             result.total += 1
 
             try:
-                transaction_import = TransactionImport.model_validate(row.values)
+                transaction_import = TransactionImport.model_validate(row)
             except ValidationError:
                 result.malformed += 1
                 continue
