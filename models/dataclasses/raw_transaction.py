@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True, slots=True)
 class RawTransaction:
-    """Raw transaction as received from the CSV."""
+    """Raw transaction as received from the file."""
 
     transaction_id: str
     account_id: str
