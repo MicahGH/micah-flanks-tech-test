@@ -74,7 +74,7 @@ The database enforces this using a unique constraint:
 
     transaction_id UNIQUE
 
-Imports use `ON CONFLICT DO NOTHING`, making the import process idempotent.
+Imports use `ON CONFLICT DO UPDATE`, making the import process idempotent.
 
 ## API
 

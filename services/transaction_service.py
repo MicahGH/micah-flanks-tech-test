@@ -76,7 +76,7 @@ class TransactionService:
                 result.imported += 1
                 self._cache.invalidate(cast("int", account.id))
             else:
-                result.duplicates += 1
+                result.updated += 1
 
         self._transaction_repo.commit()
         self._malformed_transaction_repo.commit()

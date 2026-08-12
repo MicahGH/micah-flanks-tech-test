@@ -7,5 +7,5 @@ class ImportResult:
 
     total: int = 0
     imported: int = 0
-    duplicates: int = 0
+    updated: int = 0
     malformed: int = 0

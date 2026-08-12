@@ -17,7 +17,7 @@ def test_duplicate_transaction_is_ignored(
     second = transaction_service.import_transactions(parser)
 
     assert first.imported == 1
-    assert first.duplicates == 0
+    assert first.updated == 0
 
     assert second.imported == 0
-    assert second.duplicates == 1
+    assert second.updated == 1
