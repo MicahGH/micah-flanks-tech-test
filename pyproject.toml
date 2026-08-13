@@ -74,8 +74,6 @@ reportUnknownArgumentType = true
 reportUnknownVariableType = true
 reportUnknownLambdaType = true
 reportUnknownParameterType = true
-reportUnknownReturnType = true
-reportUnknownTypeArgument = true
 
 reportUnusedImport = true
 reportUnusedVariable = true
