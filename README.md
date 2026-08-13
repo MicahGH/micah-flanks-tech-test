@@ -62,6 +62,10 @@ The importer handles:
 - ISO dates plus unambiguous `YYYY/MM/DD`, `DD-MM-YYYY`, and `DD/MM/YYYY`
   dates. Ambiguous values such as `04/06/2024`, blank dates, and unsupported
   formats are recorded as malformed instead of being guessed.
+  A production importer could use an entity-to-format map once each bank's
+  export contract is known; that would allow otherwise ambiguous values to be
+  parsed safely according to their source entity rather than applying one
+  global guess.
 - Currency and category normalization.
 - A controlled entity vocabulary (`santander`, `sabadell`, and `lacaixa`). This
   intentionally rejects unrecognised labels such as `BBVA`, `B.B.V.A`, or
