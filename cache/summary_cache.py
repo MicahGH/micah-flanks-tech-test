@@ -22,21 +22,21 @@ class SummaryCache:
             ttl=ttl_seconds,
         )
 
-    def get(self, account_id: int) -> list[TransactionsSummary] | None:
+    def get(self, external_account_id: str) -> list[TransactionsSummary] | None:
         """Get a value from the cache."""
-        return self._cache.get(account_id)
+        return self._cache.get(external_account_id)
 
     def set(
         self,
-        account_id: int,
+        external_account_id: str,
         summary: list[TransactionsSummary],
     ) -> None:
         """Set a k-v in the cache."""
-        self._cache[account_id] = summary
+        self._cache[external_account_id] = summary
 
-    def invalidate(self, account_id: int) -> None:
+    def invalidate(self, external_account_id: str) -> None:
         """Invalidate a k-v in the cache."""
-        self._cache.pop(account_id, None)
+        self._cache.pop(external_account_id, None)
 
     def clear(self) -> None:
         """Clear the entire cache."""

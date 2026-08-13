@@ -8,6 +8,7 @@ from models.typed_dicts.transactions_summary import TransactionsSummary
 def test_cache_stores_summary() -> None:
     """Test that a summary is stored in the cache."""
     cache = SummaryCache()
+    external_account_id = "abc"
 
     summary = [
         TransactionsSummary(
@@ -19,11 +20,11 @@ def test_cache_stores_summary() -> None:
     ]
 
     cache.set(
-        account_id=1,
+        external_account_id=external_account_id,
         summary=summary,
     )
 
-    result = cache.get(1)
+    result = cache.get(external_account_id)
 
     assert result == summary
 
@@ -31,13 +32,15 @@ def test_cache_stores_summary() -> None:
 def test_cache_returns_none_when_missing() -> None:
     """Test that cache returns none on a cache miss."""
     cache = SummaryCache()
+    external_account_id = "abc"
 
-    assert cache.get(999) is None
+    assert cache.get(external_account_id) is None
 
 
 def test_cache_invalidation() -> None:
     """Test that the cache invalidation functionality works properly."""
     cache = SummaryCache()
+    external_account_id = "abc"
 
     summary = [
         TransactionsSummary(
@@ -49,10 +52,10 @@ def test_cache_invalidation() -> None:
     ]
 
     cache.set(
-        account_id=1,
+        external_account_id=external_account_id,
         summary=summary,
     )
 
-    cache.invalidate(1)
+    cache.invalidate(external_account_id)
 
-    assert cache.get(1) is None
+    assert cache.get(external_account_id) is None

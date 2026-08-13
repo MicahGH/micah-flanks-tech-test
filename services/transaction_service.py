@@ -81,7 +81,7 @@ class TransactionService:
             else:
                 result.updated += 1
 
-            self._cache.invalidate(cast("int", account.id))
+            self._cache.invalidate(transaction_import.account_id)
 
         self._transaction_repo.commit()
         self._malformed_transaction_repo.commit()
@@ -89,22 +89,26 @@ class TransactionService:
         return result
 
     def get_transactions(
-        self, account_id: int, from_date: date, to_date: date
+        self, external_account_id: str, from_date: date, to_date: date
     ) -> list[Transaction]:
         """Get a list of transactions for the account and dates provided."""
-        return self._transaction_repo.get_transactions(account_id, from_date, to_date)
+        return self._transaction_repo.get_transactions(
+            external_account_id, from_date, to_date
+        )
 
-    def get_transactions_summary(self, account_id: int) -> list[TransactionsSummary]:
+    def get_transactions_summary(
+        self, external_account_id: str
+    ) -> list[TransactionsSummary]:
         """Get a summary of the transactions for the account provided."""
-        cached = self._cache.get(account_id)
+        cached = self._cache.get(external_account_id)
 
         if cached:
             return cached
 
-        summary = self._transaction_repo.get_transactions_summary(account_id)
+        summary = self._transaction_repo.get_transactions_summary(external_account_id)
 
         self._cache.set(
-            account_id,
+            external_account_id,
             summary,
         )
 

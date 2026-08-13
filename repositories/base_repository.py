@@ -2,7 +2,7 @@ from collections.abc import Iterable
 from typing import TypeVar
 
 from sqlalchemy.dialects.postgresql import insert
-from sqlmodel import Boolean, Session, SQLModel, literal_column
+from sqlmodel import Session, SQLModel, select
 
 from models.enums.upsert_result import UpsertResult
 from models.postgres.base_sql_model import BaseSQLModel
@@ -39,6 +39,11 @@ class BaseRepository[T: SQLModel]:
         conflict_columns: list[str],
     ) -> UpsertResult:
         """Insert a record or update it if it already exists."""
+        conflict_values = {column: values[column] for column in conflict_columns}
+        existing = self._session.exec(
+            select(model).filter_by(**conflict_values)
+        ).first()
+
         statement = insert(model).values(values)
 
         update_values = {
@@ -50,14 +55,6 @@ class BaseRepository[T: SQLModel]:
             set_=update_values,
         )
 
-        # Small hack to see if the statement ended up being an INSERT or an UPDATE
-        inserted_column = literal_column(
-            "(xmax = 0)",
-            type_=Boolean(),
-        ).label("inserted")
+        self._session.exec(statement)
 
-        statement = statement.returning(inserted_column)
-
-        result = self._session.exec(statement).one()
-
-        return UpsertResult.INSERTED if result.inserted else UpsertResult.UPDATED
+        return UpsertResult.UPDATED if existing else UpsertResult.INSERTED

@@ -35,7 +35,7 @@ def import_transactions(
 
 @router.get("")
 def get_transactions(
-    account_id: int,
+    external_account_id: str,
     from_date: date,
     to_date: date,
     pg_session: Annotated[Session, Depends(get_postgres_session)],
@@ -46,7 +46,7 @@ def get_transactions(
         pg_session=pg_session,
         cache=cache,
     ).get_transactions(
-        account_id=account_id,
+        external_account_id=external_account_id,
         from_date=from_date,
         to_date=to_date,
     )
@@ -54,7 +54,7 @@ def get_transactions(
 
 @router.get("/summary")
 def get_transactions_summary(
-    account_id: int,
+    external_account_id: str,
     pg_session: Annotated[Session, Depends(get_postgres_session)],
     cache: Annotated[SummaryCache, Depends(get_summary_cache)],
 ) -> list[TransactionsSummary]:
@@ -62,4 +62,4 @@ def get_transactions_summary(
     return TransactionService(
         pg_session=pg_session,
         cache=cache,
-    ).get_transactions_summary(account_id)
+    ).get_transactions_summary(external_account_id)
