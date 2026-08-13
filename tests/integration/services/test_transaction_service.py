@@ -4,10 +4,10 @@ from services.transaction_service import TransactionService
 from tests.helpers import create_raw_transaction
 
 
-def test_duplicate_transaction_is_ignored(
+def test_transaction_is_updated(
     transaction_service: TransactionService,
 ) -> None:
-    """Test that duplicate transactions are ignored in the transaction service."""
+    """Test that transactions are updated in the transaction service if existing."""
     parser = Mock()
 
     parser.parse.return_value = [create_raw_transaction(transaction_id="same-id")]
