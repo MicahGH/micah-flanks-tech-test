@@ -59,10 +59,21 @@ CSV rows are parsed directly and validated using Pydantic.
 
 The importer handles:
 
-- Different date formats.
-- Currency normalization.
+- ISO dates plus unambiguous `YYYY/MM/DD`, `DD-MM-YYYY`, and `DD/MM/YYYY`
+  dates. Ambiguous values such as `04/06/2024`, blank dates, and unsupported
+  formats are recorded as malformed instead of being guessed.
+- Currency and category normalization.
+- A controlled entity vocabulary (`santander`, `sabadell`, and `lacaixa`). This
+  intentionally rejects unrecognised labels such as `BBVA`, `B.B.V.A`, or
+  `Banco Santander`: accepting them would create inconsistent entities. Their
+  rows are retained as malformed, and can be reprocessed after an explicit
+  entity or alias mapping is added.
 - Different decimal formats (`1,234.56`, `1.234,56`, etc.).
-- Invalid rows.
+  A value using only one separator with three trailing digits (for example,
+  `1,234` or `1.234`) is rejected because it could mean either a decimal or a
+  thousands separator.
+- Required transaction, account, and IBAN identifiers.
+- Unknown columns, so an upstream CSV schema change is visible immediately.
 
 Malformed rows are skipped and counted instead of stopping the whole import process.
 
